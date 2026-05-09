@@ -1,0 +1,21 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install uv and set the Python version
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.14"
+      - name: Install dependencies
+        run: make req-dev
+
+      - name: Run linters
+        run: make lint
