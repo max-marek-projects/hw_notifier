@@ -22,3 +22,6 @@ lint-fix:
 
 run:
 	uv run bot.py
+
+test:
+	uv run python -m pytest --cov=.

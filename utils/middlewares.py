@@ -1,6 +1,6 @@
 """Additional utils."""
 
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Mapping
 
 from aiogram import BaseMiddleware
 from aiogram.enums import ChatType
@@ -12,11 +12,11 @@ from logger import logger
 class ValidateChatType(BaseMiddleware):
     """Validate chat type before any action."""
 
-    async def __call__[RetVal](
+    async def __call__[RetVal, Data: Mapping[str, object]](
         self,
-        handler: Callable[[TelegramObject, dict[str, object]], Awaitable[RetVal]],
+        handler: Callable[[TelegramObject, Data], Awaitable[RetVal]],
         event: TelegramObject,
-        data: dict[str, object],
+        data: Data,
     ) -> RetVal | None:
         """Validate chat type and then use handler.
 
@@ -40,12 +40,12 @@ class ValidateChatType(BaseMiddleware):
 class LogHandlers(BaseMiddleware):
     """Validate chat type before any action."""
 
-    async def __call__[RetVal](
+    async def __call__[RetVal, Data: Mapping[str, object]](
         self,
-        handler: Callable[[TelegramObject, dict[str, object]], Awaitable[RetVal]],
+        handler: Callable[[TelegramObject, Data], Awaitable[RetVal]],
         event: TelegramObject,
-        data: dict[str, object],
-    ) -> RetVal:
+        data: Data,
+    ) -> RetVal | None:
         """Validate chat type and then use handler.
 
         Args:
