@@ -1,78 +1,104 @@
-### Проект "Тестовый бот". Python-разработчик (бекенд) (Яндекс.Практикум)
+# Homework Notifier Bot
 
-### Описание:
-Данный проект разрабатывался для практики в создании Telegram-ботов и их связи с различными API-сервисами
+Telegram bot that monitors Yandex.Practicum homework statuses and sends instant notifications.  
+Also provides an Excel report of all homework submissions.
 
-Данный проект "Тестовый бот" в Telegram на основании Bot API используется для проверки статуса отправленного на ревью домашнего задания.
+## Features
 
-Polling был настроен на опрос API сервиса Практикум.Домашка каждые 10 минут. 
+- 🔔 Real‑time homework status notifications
+- 📊 Full homework report in `.xlsx` format
+- ⚙️ Enable/disable notifications per user
+- 🛡️ Works only in private chats for security
+- 📝 Detailed logging to file and console
 
-При обновлении статуса ответ API анализируется, и отправляется соответствующее уведомление в Telegram.
+## Tech Stack
 
-С помощью библиотеки python-dotenv было реализовано скрытие данных, необходимых для работы бота из кода.
+- Python 3.14+
+- [aiogram](https://docs.aiogram.dev/) – Telegram Bot API framework
+- [aiosqlite](https://github.com/omnilib/aiosqlite) – async SQLite
+- [httpx](https://www.python-httpx.org/) – async HTTP client
+- [pandas](https://pandas.pydata.org/) + [openpyxl](https://openpyxl.readthedocs.io/) – Excel reports
+- [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) – configuration management
+- [make](https://www.gnu.org/software/make/manual/make.html) - commands execution
+- [uv](https://docs.astral.sh/uv/) - package management
 
-С помощью библиотеки logging был реализован журнал ошибок и система сообщения о важных проблемах сообщением в Telegram.
+## Installation
 
-### Как запустить проект:
+### Clone the repository
 
-Клонируйте репозиторий:
-```
-git clone git@github.com:Starkiller2000Turbo/homework_bot.git
-```
-
-Измените свою текущую рабочую дерикторию:
-```
-cd /homework_bot/
-```
-
-Создайте и активируйте виртуальное окружение
-
-```
-python -m venv venv
-```
-
-```
-source venv/Scripts/activate
+```bash
+git clone https://github.com/yourusername/hw-notifier.git
+cd hw-notifier
 ```
 
-Обновите pip:
-```
-python3 -m pip install --upgrade pip
+### Install dependencies
+
+Recommended: use `uv`
+
+```bash
+make req
 ```
 
-Установите зависимости из requirements.txt:
+### Create a `.env` file in the project root
 
-```
-pip install -r requirements.txt
-```
-
-Создайте файл .env, где будут указаны без кавычек:
-
-Токен на сервисе Практирум.Домашка:
-```
-PRACTICUM_TOKEN=...
-```
-Токен бота:
-```
-TOKEN=...
-```
-ID чата в телеграм:
-```
-CHAT_ID=...
-```
-Запустите бота:
-
-```
-python homework.py
+```bash
+TOKEN=your_telegram_bot_token_here
 ```
 
-### Авторы:
+Get the token from [@BotFather](https://t.me/BotFather).
 
-- :white_check_mark: [Starkiller2000Turbo](https://github.com/Starkiller2000Turbo)
+## Running the Bot
 
-### Стек технологий использованный в проекте:
+```bash
+make run
+```
 
-- Python
-- API
-- Bot API
-- logging
+The bot will:
+
+- Create the SQLite database and tables
+- Start polling Yandex.Practicum every 30 seconds
+- Send notifications to registered users
+
+## Usage
+
+Start a private chat with the bot and use the buttons:
+
+- **Register using Yandex OAuth** – obtain a token from [Yandex OAuth](https://oauth.yandex.ru/authorize?response_type=token&client_id=1d0b9dd4d652455a9eb710d450ff456a) and send it to the bot.
+- **Notify on homework updates** – enable notifications.
+- **Stop notifications** – disable notifications.
+- **Full report** – generate and download an Excel file with all homework items.
+- **Help** – shows the main menu.
+
+## How It Works
+
+1. User registers with a Yandex.Practicum OAuth token.
+2. The bot periodically calls the Practicum API (`/api/user_api/homework_statuses/`) for each active user.
+3. When a new homework status is found, the bot sends a message with the update.
+4. Users can request a complete `.xlsx` report at any time.
+
+## Development
+
+### Linting & Type Checking
+
+Install optional lint dependencies:
+
+```bash
+make req-dev
+```
+
+Then run:
+
+```bash
+make lint
+make lint-fix  # apply autofixes where possible
+```
+
+## Notes
+
+- The bot only works in **private chats** (security requirement).
+- Tokens are stored as plain text in the database – treat the database file as sensitive.
+- Logs are written to `logs/` directory with timestamps.
+
+## License
+
+This project is for educational purposes. No explicit license is provided.
