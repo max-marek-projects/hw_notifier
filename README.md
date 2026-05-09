@@ -7,7 +7,6 @@ Also provides an Excel report of all homework submissions.
 
 - 🔔 Real‑time homework status notifications
 - 📊 Full homework report in `.xlsx` format
-- 🔐 Secure token storage (SQLite)
 - ⚙️ Enable/disable notifications per user
 - 🛡️ Works only in private chats for security
 - 📝 Detailed logging to file and console
@@ -40,7 +39,7 @@ Recommended: use `uv`
 make req
 ```
 
-### Create a `.env` file** in the project root
+### Create a `.env` file in the project root
 
 ```bash
 TOKEN=your_telegram_bot_token_here
