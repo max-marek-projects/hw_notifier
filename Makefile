@@ -24,4 +24,4 @@ run:
 	uv run bot.py
 
 test:
-	uv run python -m pytest --cov=.
+	uv run python -m pytest --cov=. --cov-report=term-missing
