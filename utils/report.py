@@ -1,7 +1,6 @@
 """Excel report handling."""
 
 import io
-from pathlib import Path
 
 import httpx
 import pandas as pd
@@ -27,7 +26,6 @@ async def create_report(token: str) -> io.BytesIO:
     async with httpx.AsyncClient(timeout=config.REQUEST_TIMEOUT) as session:
         homeworks = await get_api_answer(session, token, from_timestamp=0)
     data = pd.DataFrame(homeworks, columns=pd.Index(HWItem.__annotations__.keys()))
-    Path("./temp.xlsx")
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer) as writer:
         data.to_excel(writer, sheet_name="Homeworks", index=False)
@@ -45,4 +43,5 @@ async def create_report(token: str) -> io.BytesIO:
         )
         table.tableStyleInfo = style
         worksheet.add_table(table)
+    buffer.seek(0)
     return buffer

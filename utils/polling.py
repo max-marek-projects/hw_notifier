@@ -6,6 +6,7 @@ from datetime import datetime
 
 import httpx
 from aiogram import Bot
+from aiogram.utils.formatting import Bold, Code, Text
 from pydantic import TypeAdapter
 
 from config import DateFormats, Urls, config
@@ -36,27 +37,40 @@ async def get_api_answer(session: httpx.AsyncClient, token: str, from_timestamp:
         raise
 
 
-def get_message_text(homework: HWItem) -> str:
+def get_message_text(homework: HWItem) -> Text:
     """Format status message.
 
     Args:
-        homework: data received from practicum endpoint.
+        homework: single homework data.
 
     Returns:
-        Message text according to received status.
+        Formatted text answer.
     """
     pretty_date = datetime.strptime(homework["date_updated"], DateFormats.PRACTICUM).strftime(DateFormats.USER_FRIENDLY)
-    return (
-        "Update:\n"
-        f"- Homework `{homework['homework_name']}` (id {homework['id']})\n"
-        f"- Lesson `{homework['lesson_name']}`:\n"
-        f"- New status: `{homework['status']}`\n"
-        f"- At: {pretty_date}\n"
-        f"- Comment: `{homework['reviewer_comment']}`\n"
+
+    return Text(
+        Bold("Update"),
+        "\n",
+        Bold("- Homework: "),
+        Code(str(homework["homework_name"])),
+        " (id ",
+        Code(str(homework["id"])),
+        ")\n",
+        Bold("- Lesson: "),
+        Code(str(homework["lesson_name"])),
+        "\n",
+        Bold("- New status: "),
+        Code(str(homework["status"])),
+        "\n",
+        Bold("- At: "),
+        pretty_date,
+        "\n",
+        Bold("- Comment: "),
+        Code(str(homework["reviewer_comment"])),
     )
 
 
-async def send_notification(bot: Bot, chat_id: int, text: str) -> None:
+async def send_notification(bot: Bot, chat_id: int, text: str | Text) -> None:
     """Send message to user.
 
     Args:
@@ -65,7 +79,10 @@ async def send_notification(bot: Bot, chat_id: int, text: str) -> None:
         text: message text.
     """
     try:
-        await bot.send_message(chat_id=chat_id, text=text)
+        if isinstance(text, Text):
+            await bot.send_message(chat_id=chat_id, **text.as_kwargs())
+        else:
+            await bot.send_message(chat_id=chat_id, text=text)
     except Exception as ex:
         logger.error(f"Failed to send message to {chat_id}: {ex}")
         raise

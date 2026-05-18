@@ -12,10 +12,10 @@ from logger import logger
 class ValidateChatType(BaseMiddleware):
     """Validate chat type before any action."""
 
-    async def __call__[RetVal, Data: Mapping[str, object]](
+    async def __call__[RetVal, Event: TelegramObject, Data: Mapping[str, object]](
         self,
-        handler: Callable[[TelegramObject, Data], Awaitable[RetVal]],
-        event: TelegramObject,
+        handler: Callable[[Event, Data], Awaitable[RetVal]],
+        event: Event,
         data: Data,
     ) -> RetVal | None:
         """Validate chat type and then use handler.
@@ -40,10 +40,10 @@ class ValidateChatType(BaseMiddleware):
 class LogHandlers(BaseMiddleware):
     """Validate chat type before any action."""
 
-    async def __call__[RetVal, Data: Mapping[str, object]](
+    async def __call__[RetVal, Event: TelegramObject, Data: Mapping[str, object]](
         self,
-        handler: Callable[[TelegramObject, Data], Awaitable[RetVal]],
-        event: TelegramObject,
+        handler: Callable[[Event, Data], Awaitable[RetVal]],
+        event: Event,
         data: Data,
     ) -> RetVal | None:
         """Validate chat type and then use handler.
@@ -59,20 +59,8 @@ class LogHandlers(BaseMiddleware):
         handler_name = getattr(handler, "__name__", str(handler))
         try:
             result = await handler(event, data)
-            logger.debug(
-                'Call handler "%s" with arguments %s, %s returns %s',
-                handler_name,
-                event,
-                data,
-                result,
-            )
+            logger.debug('Call handler "%s" with arguments %s, %s returns %s', handler_name, event, data, result)
             return result
         except Exception as ex:
-            logger.error(
-                'Call handler "%s" with arguments %s, %s raises %s',
-                handler_name,
-                event,
-                data,
-                ex,
-            )
+            logger.error('Call handler "%s" with arguments %s, %s raises %s', handler_name, event, data, ex)
             raise

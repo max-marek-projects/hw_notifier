@@ -57,11 +57,11 @@ select = [
     "PTH",   # use pathlib
     "ASYNC", # async functions
     "N",     # naming convention
+    "PT",    # pytest-s
 ]
 fixable = ["ALL"]
 ignore = [
-    "D413",   # blank line after last docstring section
-    "COM812", # missing trailing comma
+    "D413", # blank line after last docstring section
 ]
 
 [tool.ruff.format]
@@ -73,7 +73,10 @@ line-ending = "auto"
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["S101"]
+"tests/**/*.py" = [
+    "S101", # allow using assert-s
+    "S106", # allow hardcode passwords (test values)
+]
 
 
 [tool.mypy]
@@ -85,19 +88,16 @@ disallow_untyped_decorators = true
 enable_error_code = ['deprecated']
 exclude = ['temp/']
 
+[tool.ty.environment]
+python = "./.venv"
+
 [tool.ty.src]
 exclude = ['temp/']
 
 
 [tool.pytest]
-# norecursedirs = ["env/*"]
-# addopts = [
-#     "-vv",
-#     "-p",
-#     "no:cacheprovider",
-#     "-p",
-#     "no:warnings",
-#     "--show-capture=no",
-# ]
 testpaths = ["tests/"]
 python_files = ["test_*.py"]
+
+[tool.coverage.report]
+exclude_also = ["if __name__ == .__main__.:"]

@@ -10,7 +10,7 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import BufferedInputFile, ErrorEvent, ForceReply, KeyboardButton, Message, ReplyKeyboardMarkup
 
-from config import Buttons, States, Urls, config
+from config import DEFAULT_PHRASES, Buttons, States, Urls, config
 from logger import logger
 from utils.db import db
 from utils.middlewares import LogHandlers, ValidateChatType
@@ -39,11 +39,7 @@ def build_keyboard(user_status: UserStatus) -> ReplyKeyboardMarkup:
         first_button = KeyboardButton(text=Buttons.NOTIFY_TEXT)
 
     return ReplyKeyboardMarkup(
-        keyboard=[
-            [first_button],
-            [KeyboardButton(text=Buttons.REPORT_TEXT)],
-            [KeyboardButton(text=Buttons.HELP)],
-        ],
+        keyboard=[[first_button], [KeyboardButton(text=Buttons.REPORT_TEXT)], [KeyboardButton(text=Buttons.HELP)]],
         resize_keyboard=True,
         input_field_placeholder="Choose an action",
     )
@@ -75,10 +71,7 @@ async def start(message: Message) -> None:
     if not (user_id := await get_user_id(message)):
         return
     status = await db.get_user_status(user_id)
-    await message.answer(
-        "Welcome! What is thy bidding, my master?",
-        reply_markup=build_keyboard(status),
-    )
+    await message.answer("Welcome! What is thy bidding, my master?", reply_markup=build_keyboard(status))
 
 
 @router.message(F.text == Buttons.REGISTER_TEXT)
@@ -153,10 +146,7 @@ async def enable_notifications(message: Message) -> None:
     await db.set_enabled(user_id, enabled=True)
 
     status = await db.get_user_status(user_id)
-    await message.answer(
-        "Notifications are enabled.",
-        reply_markup=build_keyboard(status),
-    )
+    await message.answer("Notifications are enabled.", reply_markup=build_keyboard(status))
 
 
 @router.message(F.text == Buttons.STOP_TEXT)
@@ -168,12 +158,9 @@ async def disable_notifications(message: Message) -> None:
     """
     if not (user_id := await get_user_id(message)):
         return
-    await db.set_enabled(user_id, enabled=True)
+    await db.set_enabled(user_id, enabled=False)
     status = await db.get_user_status(user_id)
-    await message.answer(
-        "Notifications are disabled.",
-        reply_markup=build_keyboard(status),
-    )
+    await message.answer("Notifications are disabled.", reply_markup=build_keyboard(status))
 
 
 @router.message(F.text == Buttons.REPORT_TEXT)
@@ -203,7 +190,8 @@ async def full_report(message: Message) -> None:
     except Exception as ex:
         logger.exception(f"Failed to generate/send report for user {user_id}: {ex}")
         await message.answer(
-            "❌ Failed to generate report. Please try again later.", reply_markup=build_keyboard(status)
+            "❌ Failed to generate report. Please try again later.",
+            reply_markup=build_keyboard(status),
         )
     finally:
         await wait_msg.delete()
@@ -252,12 +240,7 @@ async def default_handler(message: Message) -> None:
     Args:
         message: received message.
     """
-    default_phrases = [
-        "This is not the command you're looking for. Move along.",
-        "I've got a bad feeling about this... Try something else.",
-        "Do or do not (press button). There is no 'try' (sending some other message)",
-    ]
-    phrase = random.choice(default_phrases)  # noqa: S311 - not cryptographic purposes
+    phrase = random.choice(DEFAULT_PHRASES)  # noqa: S311 - not cryptographic purposes
     await message.reply(phrase)
 
 

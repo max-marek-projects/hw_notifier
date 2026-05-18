@@ -39,12 +39,7 @@ class Settings(BaseSettings):  # type: ignore[explicit-any]
     LOGGER_LEVEL: LoggingLevels = LoggingLevels.INFO
     LOGGER_NAME: str = "HW-bot"
 
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
-        extra="ignore",
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore")
 
 
 class Buttons(StrEnum):
@@ -81,5 +76,11 @@ class DateFormats(StrEnum):
     USER_FRIENDLY = "%d.%m.%Y %H:%M:%S"
     LOGS = "%Y-%m-%d %H.%M.%S.%f"
 
+
+DEFAULT_PHRASES = [
+    "This is not the command you're looking for. Move along.",
+    "I've got a bad feeling about this... Try something else.",
+    "Do or do not (press button). There is no 'try' (sending some other message)",
+]
 
 config = Settings()
