@@ -74,7 +74,6 @@ async def test_register_valid(mocker: MockerFixture, valid_message_mock: AsyncMo
 
     state_mock.set_state.assert_awaited_once()
     valid_message_mock.answer.assert_called_once()
-    # Проверяем, что ForceReply используется
     call_args = valid_message_mock.answer.call_args[1]
     assert "reply_markup" in call_args
 
