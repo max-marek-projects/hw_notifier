@@ -158,7 +158,7 @@ async def disable_notifications(message: Message) -> None:
     """
     if not (user_id := await get_user_id(message)):
         return
-    await db.set_enabled(user_id, enabled=True)
+    await db.set_enabled(user_id, enabled=False)
     status = await db.get_user_status(user_id)
     await message.answer("Notifications are disabled.", reply_markup=build_keyboard(status))
 
