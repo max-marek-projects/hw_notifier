@@ -12,6 +12,7 @@ from pytest_mock import MockerFixture, MockType
 import bot
 from bot import build_keyboard, default_handler, get_user_id, handle_errors, help_handler, main
 from config import DEFAULT_PHRASES, Buttons
+from utils.db import DB
 from utils.types import UserStatus
 
 
@@ -54,7 +55,13 @@ async def test_get_user_id(valid_message_mock: AsyncMock, invalid_message_mock: 
 
 @pytest.mark.asyncio
 async def test_register_valid(mocker: MockerFixture, valid_message_mock: AsyncMock, test_user_id: int) -> None:
-    """Test registration start."""
+    """Test registration start.
+
+    Args:
+        mocker: fixture for mocking objects.
+        valid_message_mock: mock for valid message behavior.
+        test_user_id: test user id for all tests.
+    """
     mocker.patch("bot.get_user_id", return_value=test_user_id)
     db_mock = mocker.patch("bot.db")
     db_mock.get_user_status = AsyncMock()
@@ -73,8 +80,13 @@ async def test_register_valid(mocker: MockerFixture, valid_message_mock: AsyncMo
 
 
 @pytest.mark.asyncio
-async def test_register_invalid(mocker: MockerFixture, invalid_message_mock: AsyncMock, test_user_id: int) -> None:
-    """Test registration start."""
+async def test_register_invalid(mocker: MockerFixture, invalid_message_mock: AsyncMock) -> None:
+    """Test registration start.
+
+    Args:
+        mocker: fixture for mocking objects.
+        invalid_message_mock: mock for invalid message behavior.
+    """
     mocker.patch("bot.get_user_id", return_value=None)
     db_mock = mocker.patch("bot.db")
     db_mock.get_user_status = AsyncMock()
@@ -143,6 +155,7 @@ async def test_handle_errors_with_message(mocker: MockerFixture, valid_message_m
     """
     mocker.patch.object(Logger, "info")
     mocker.patch.object(Logger, "warning")
+    mocker.patch.object(DB, "set_enabled", return_value=None)
     event = ErrorEvent(
         update=Update(update_id=123456, message=valid_message_mock),
         exception=TelegramForbiddenError(method=SendMessage(chat_id=123456, text="test"), message="test"),
@@ -166,7 +179,11 @@ async def test_default_handler(valid_message_mock: AsyncMock) -> None:
 
 @pytest.mark.asyncio
 async def test_main(mocker: MockerFixture) -> None:
-    """Test main entry point."""
+    """Test main entry point.
+
+    Args:
+        mocker: fixture to mock logger.
+    """
     create_users_mock = mocker.patch("utils.db.db.create_users")
     bot_mock = AsyncMock()
     bot_constructor = mocker.patch("bot.Bot", return_value=bot_mock)
